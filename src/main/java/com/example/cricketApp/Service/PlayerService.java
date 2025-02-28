@@ -21,12 +21,12 @@ public class PlayerService {
     @Autowired
     private TeamRepository teamRepository;
 
-    public ResponseEntity<List<Player>> getAllPlayers() {
+    public ResponseEntity<?> getAllPlayers() {
         try {
             List<Player> players = playerRepository.findAll();
             return new ResponseEntity<>(players, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Error getting all players", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

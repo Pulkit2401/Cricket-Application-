@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
+
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -42,6 +45,7 @@ public class MatchService {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<?> playMatch(int matchId) {
         try{
             Match match = matchRepository.findById(matchId).orElse(null);
@@ -104,6 +108,7 @@ public class MatchService {
 
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return new ResponseEntity<>("Error in playing match: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 

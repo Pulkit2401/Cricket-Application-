@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class HealthCheckController {
 
     @GetMapping("/")
-    public String healthCheck(){
+    public String healthCheck() throws Exception {
+
         return "App is running fine";
+
     }
 }

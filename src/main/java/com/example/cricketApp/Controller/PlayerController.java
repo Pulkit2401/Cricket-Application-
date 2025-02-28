@@ -16,7 +16,7 @@ public class PlayerController {
     private PlayerService playerService;
 
     @GetMapping
-    public ResponseEntity<List<Player>> getAllPlayers() {
+    public ResponseEntity<?> getAllPlayers(){
         return playerService.getAllPlayers();
     }
 

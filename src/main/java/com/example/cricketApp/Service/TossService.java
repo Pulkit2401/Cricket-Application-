@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,6 +29,7 @@ public class TossService {
     @Autowired
     private PlayerRepository playerRepository;
 
+    @Transactional
     public ResponseEntity<?> performToss(Match match, int teamId1, int teamId2){
         if(matchRepository.findById(match.getMatchId()).isPresent()){
             return new ResponseEntity<>("This match already exists" , HttpStatus.CONFLICT);
