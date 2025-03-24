@@ -1,5 +1,6 @@
 package com.example.cricketApp.Service;
-import com.example.cricketApp.Dto.MatchDto;
+import com.example.cricketApp.Dto.MatchRequestDto;
+import com.example.cricketApp.Dto.TeamResponseDto;
 import com.example.cricketApp.Entity.Inning;
 import com.example.cricketApp.Entity.Match;
 import com.example.cricketApp.Entity.Player;
@@ -40,16 +41,16 @@ public class TossServiceImpl implements TossService {
     private PlayerRepository playerRepository;
 
     @Transactional
-    public ResponseEntity<?> performToss(MatchDto matchDto, int teamId1, int teamId2) {
-        Team team1;
-        Team team2;
+    public ResponseEntity<?> performToss(MatchRequestDto matchRequestDto, int teamId1, int teamId2) {
+        TeamResponseDto team1;
+        TeamResponseDto team2;
         System.out.println("Toss time....");
         int toss = (int) (Math.random() * 10) % 2;
 
         Match match = Match.builder()
-                .matchId(matchDto.getMatchId())
-                .venue(matchDto.getVenue())
-                .overs(matchDto.getOvers())
+                .matchId(matchRequestDto.getMatchId())
+                .venue(matchRequestDto.getVenue())
+                .overs(matchRequestDto.getOvers())
                 .build();
 
         if (toss == 0) {
@@ -114,8 +115,8 @@ public class TossServiceImpl implements TossService {
         return new ResponseEntity<>(team1.getTeamName() + " won the toss and will bat first", HttpStatus.OK);
     }
 
-    public ResponseEntity<?> toss(MatchDto matchDto, Team team1, Team team2) throws ExecutionException, InterruptedException {
-        if (matchRepository.existsById(matchDto.getMatchId())) {
+    public ResponseEntity<?> toss(MatchRequestDto matchRequestDto, Team team1, Team team2) throws ExecutionException, InterruptedException {
+        if (matchRepository.existsById(matchRequestDto.getMatchId())) {
             return new ResponseEntity<>("This match already exists", HttpStatus.CONFLICT);
         }
         Future<ResponseEntity<?>> futureObj = ThreadPool.matchExecutor.submit(() -> {
@@ -137,7 +138,7 @@ public class TossServiceImpl implements TossService {
                 teamsWaiting.remove(team1.getTeamId());
                 teamsWaiting.remove(team2.getTeamId());
 
-                return performToss(matchDto, team1.getTeamId(), team2.getTeamId());
+                return performToss(matchRequestDto, team1.getTeamId(), team2.getTeamId());
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
                 System.out.println(Thread.currentThread().getName() + " was interrupted.");
@@ -147,7 +148,6 @@ public class TossServiceImpl implements TossService {
                 System.out.println(Thread.currentThread().getName() + " released lock.");
             }
         });
-
         return futureObj.get();
     }
 

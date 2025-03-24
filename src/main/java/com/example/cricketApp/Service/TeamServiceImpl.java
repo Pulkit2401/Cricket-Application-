@@ -1,7 +1,9 @@
 package com.example.cricketApp.Service;
 
-import com.example.cricketApp.Dto.TeamDto;
+import com.example.cricketApp.Dto.TeamRequestDto;
+import com.example.cricketApp.Dto.TeamResponseDto;
 import com.example.cricketApp.Entity.Team;
+import com.example.cricketApp.Mapper.TeamMapper;
 import com.example.cricketApp.Repository.PlayerRepository;
 import com.example.cricketApp.Repository.TeamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,23 +21,24 @@ public class TeamServiceImpl implements TeamService {
     @Autowired
     private PlayerRepository playerRepository;
 
-    public ResponseEntity<List<Team>> getAllTeams() {
+    public ResponseEntity<List<TeamResponseDto>> getAllTeams() {
         try {
             List<Team> teams = teamRepository.findAll();
             if (teams.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
-            return new ResponseEntity<>(teams, HttpStatus.OK);
+            List<TeamResponseDto> teamResponseDtos = teams.stream().map(TeamMapper::toDto).toList();
+            return new ResponseEntity<>(teamResponseDtos, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public ResponseEntity<String> addTeam(TeamDto teamDto) {
+    public ResponseEntity<String> addTeam(TeamRequestDto teamRequestDto) {
         try {
             Team team = Team.builder()
-                            .teamId(teamDto.getTeamId())
-                                    .teamName(teamDto.getTeamName())
+                            .teamId(teamRequestDto.getTeamId())
+                                    .teamName(teamRequestDto.getTeamName())
                                             .build();
             teamRepository.save(team);
             return new ResponseEntity<>("Team added successfully", HttpStatus.CREATED);
@@ -44,17 +47,21 @@ public class TeamServiceImpl implements TeamService {
         }
     }
 
-    public ResponseEntity<Team> getTeamById(int teamId) {
+    public ResponseEntity<TeamResponseDto> getTeamById(int teamId) {
         try {
-            Optional<Team> team = teamRepository.findById(teamId);
-            return team.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                    .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+            Optional <Team> teamObj = teamRepository.findById(teamId);
+            if(teamObj.isEmpty()){
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            TeamResponseDto teamResponseDto = TeamMapper.toDto(teamObj.get());
+            return  new ResponseEntity<>(teamResponseDto, HttpStatus.OK);
+
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public ResponseEntity<?> updateTeamById(TeamDto teamDto, int teamId) {
+    public ResponseEntity<?> updateTeamById(TeamRequestDto teamRequestDto, int teamId) {
         try {
             Optional<Team> teamOpt = teamRepository.findById(teamId);
             if (teamOpt.isEmpty()) {
@@ -62,10 +69,11 @@ public class TeamServiceImpl implements TeamService {
             }
 
             Team oldTeam = teamOpt.get();
-            oldTeam.setTeamName(!teamDto.getTeamName().isEmpty() ? teamDto.getTeamName() : oldTeam.getTeamName());
+            oldTeam.setTeamName(!teamRequestDto.getTeamName().isEmpty() ? teamRequestDto.getTeamName() : oldTeam.getTeamName());
             teamRepository.save(oldTeam);
+            TeamResponseDto teamResponseDto = TeamMapper.toDto(oldTeam);
 
-            return new ResponseEntity<>(oldTeam, HttpStatus.OK);
+            return new ResponseEntity<>(teamResponseDto, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Error updating team: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

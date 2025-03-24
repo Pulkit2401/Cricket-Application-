@@ -1,5 +1,6 @@
 package com.example.cricketApp.Controller;
 
+import com.example.cricketApp.Dto.InningResponseDto;
 import com.example.cricketApp.Entity.Inning;
 import com.example.cricketApp.Service.InningServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ public class InningController {
     private InningServiceImpl inningServiceImpl;
 
     @GetMapping
-    public ResponseEntity<List<Inning>> getAllInnings(){
+    public ResponseEntity<List<InningResponseDto>> getAllInnings(){
         return inningServiceImpl.getAllInnings();
     }
 

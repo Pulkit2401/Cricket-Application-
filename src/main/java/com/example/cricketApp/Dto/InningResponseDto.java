@@ -1,27 +1,18 @@
-package com.example.cricketApp.Entity;
+package com.example.cricketApp.Dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
-import org.springframework.context.annotation.Scope;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-@Document("innings")
-@Scope("prototype")
-@Component
+@AllArgsConstructor
 @Builder
-public class Inning {
-    @Id
+public class InningResponseDto {
     private ObjectId inningId;
     private int inningNumber;
     private int matchId;

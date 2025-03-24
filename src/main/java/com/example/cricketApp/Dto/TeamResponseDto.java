@@ -1,14 +1,13 @@
 package com.example.cricketApp.Dto;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TeamDto {
+public class TeamResponseDto {
     private int teamId;
+    @NonNull
     private String teamName;
+    private int numberOfWins;
 }

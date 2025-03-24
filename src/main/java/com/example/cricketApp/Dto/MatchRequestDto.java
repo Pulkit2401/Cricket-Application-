@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MatchDto {
+public class MatchRequestDto {
     private int matchId;
     private String venue;
     private int overs;

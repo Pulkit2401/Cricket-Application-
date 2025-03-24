@@ -1,8 +1,10 @@
 package com.example.cricketApp.Service;
 
-import com.example.cricketApp.Dto.PlayerDto;
+import com.example.cricketApp.Dto.PlayerRequestDto;
+import com.example.cricketApp.Dto.PlayerResponseDto;
 import com.example.cricketApp.Entity.Player;
 import com.example.cricketApp.Entity.Team;
+import com.example.cricketApp.Mapper.PlayerMapper;
 import com.example.cricketApp.Repository.PlayerRepository;
 import com.example.cricketApp.Repository.TeamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,24 +28,25 @@ public class PlayerServiceImpl implements PlayerService {
     @Autowired
     private RedisServiceImpl redisServiceImpl;
 
-    public ResponseEntity<?> getAllPlayers() {
+    public ResponseEntity<List<PlayerResponseDto>> getAllPlayers() {
         try {
             List<Player> players = playerRepository.findAll();
-            return new ResponseEntity<>(players, HttpStatus.OK);
+            List<PlayerResponseDto> playerResponseDtos = players.stream().map(PlayerMapper::toDto).toList();
+            return new ResponseEntity<>(playerResponseDtos, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>("Error getting all players", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public ResponseEntity<String> addPlayer(PlayerDto playerDto) {
+    public ResponseEntity<String> addPlayer(PlayerRequestDto playerRequestDto) {
         try {
-            if (playerRepository.existsById(playerDto.getPlayerId())) {
+            if (playerRepository.existsById(playerRequestDto.getPlayerId())) {
                 return new ResponseEntity<>("Player with this ID already exists", HttpStatus.CONFLICT);
             }
             Player player = Player.builder()
-                            .playerId(playerDto.getPlayerId())
-                                    .playerName(playerDto.getPlayerName())
-                                            .playerType(playerDto.getPlayerType())
+                            .playerId(playerRequestDto.getPlayerId())
+                                    .playerName(playerRequestDto.getPlayerName())
+                                            .playerType(playerRequestDto.getPlayerType())
                                                     .build();
 
             playerRepository.save(player);
@@ -65,22 +68,25 @@ public class PlayerServiceImpl implements PlayerService {
             if (player == null) {
                 return new ResponseEntity<>("Player not found", HttpStatus.NOT_FOUND);
             }
+            PlayerResponseDto playerResponseDto = PlayerMapper.toDto(player);
             redisServiceImpl.savePlayerStats(key, player, 1, TimeUnit.DAYS);
-            return new ResponseEntity<>(player, HttpStatus.OK);
+            return new ResponseEntity<>(playerResponseDto, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Error retrieving player", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public ResponseEntity<?> updatePlayerById(PlayerDto playerDto, int playerId) {
+    public ResponseEntity<?> updatePlayerById(PlayerRequestDto playerRequestDto, int playerId) {
         try {
             Player oldPlayer = playerRepository.findById(playerId).orElse(null);
             if (oldPlayer != null) {
-                oldPlayer.setPlayerId(playerDto.getPlayerId() != 0 ? playerDto.getPlayerId() : oldPlayer.getPlayerId());
-                oldPlayer.setPlayerName(!playerDto.getPlayerName().equals("") ? playerDto.getPlayerName() : oldPlayer.getPlayerName());
-                oldPlayer.setPlayerType(playerDto.getPlayerType() != null ? playerDto.getPlayerType() : oldPlayer.getPlayerType());
-                 playerRepository.save(oldPlayer);
-                return new ResponseEntity<>(oldPlayer, HttpStatus.OK);
+                oldPlayer.setPlayerId(playerRequestDto.getPlayerId() != 0 ? playerRequestDto.getPlayerId() : oldPlayer.getPlayerId());
+                oldPlayer.setPlayerName(!playerRequestDto.getPlayerName().equals("") ? playerRequestDto.getPlayerName() : oldPlayer.getPlayerName());
+                oldPlayer.setPlayerType(playerRequestDto.getPlayerType() != null ? playerRequestDto.getPlayerType() : oldPlayer.getPlayerType());
+                playerRepository.save(oldPlayer);
+
+                PlayerResponseDto playerResponseDto = PlayerMapper.toDto(oldPlayer);
+                return new ResponseEntity<>(playerResponseDto, HttpStatus.OK);
             }
             return new ResponseEntity<>("Player not found", HttpStatus.NOT_FOUND);
         } catch (Exception e) {

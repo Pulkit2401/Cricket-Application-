@@ -1,11 +1,13 @@
 package com.example.cricketApp.Controller;
 
-import com.example.cricketApp.Dto.PlayerDto;
-import com.example.cricketApp.Entity.Player;
+import com.example.cricketApp.Dto.PlayerRequestDto;
+import com.example.cricketApp.Dto.PlayerResponseDto;
 import com.example.cricketApp.Service.PlayerServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/player")
@@ -15,13 +17,13 @@ public class PlayerController {
     private PlayerServiceImpl playerServiceImpl;
 
     @GetMapping
-    public ResponseEntity<?> getAllPlayers(){
+    public ResponseEntity<List<PlayerResponseDto>> getAllPlayers(){
         return playerServiceImpl.getAllPlayers();
     }
 
     @PostMapping
-    public ResponseEntity<String> addPlayer(@RequestBody PlayerDto playerDto) {
-        return playerServiceImpl.addPlayer(playerDto);
+    public ResponseEntity<String> addPlayer(@RequestBody PlayerRequestDto playerRequestDto) {
+        return playerServiceImpl.addPlayer(playerRequestDto);
     }
 
     @GetMapping("/{playerId}")
@@ -30,8 +32,8 @@ public class PlayerController {
     }
 
     @PutMapping("/{playerId}")
-    public ResponseEntity<?> updatePlayerById(@RequestBody PlayerDto playerDto, @PathVariable int playerId) {
-        return playerServiceImpl.updatePlayerById(playerDto, playerId);
+    public ResponseEntity<?> updatePlayerById(@RequestBody PlayerRequestDto playerRequestDto, @PathVariable int playerId) {
+        return playerServiceImpl.updatePlayerById(playerRequestDto, playerId);
     }
 
     @DeleteMapping("/{playerId}")

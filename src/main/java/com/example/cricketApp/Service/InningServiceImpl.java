@@ -1,6 +1,8 @@
 package com.example.cricketApp.Service;
 
+import com.example.cricketApp.Dto.InningResponseDto;
 import com.example.cricketApp.Entity.*;
+import com.example.cricketApp.Mapper.InningMapper;
 import com.example.cricketApp.Repository.InningRepository;
 import com.example.cricketApp.Repository.TeamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +19,14 @@ public class InningServiceImpl implements InningService {
     @Autowired
     private TeamRepository teamRepository;
 
-    public ResponseEntity<List<Inning>> getAllInnings(){
+    public ResponseEntity<List<InningResponseDto>> getAllInnings(){
         try {
             List <Inning> innings = inningRepository.findAll();
             if (innings.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
-            return new ResponseEntity<>(innings, HttpStatus.OK);
+            List<InningResponseDto> inningResponseDtos = innings.stream().map(InningMapper::toDto).toList();
+            return new ResponseEntity<>(inningResponseDtos, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

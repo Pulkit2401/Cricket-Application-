@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PlayerDto {
+public class PlayerRequestDto {
     private int playerId;
     private String playerName;
     private PlayerType playerType;

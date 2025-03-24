@@ -1,6 +1,7 @@
 package com.example.cricketApp.Controller;
 
-import com.example.cricketApp.Dto.TeamDto;
+import com.example.cricketApp.Dto.TeamRequestDto;
+import com.example.cricketApp.Dto.TeamResponseDto;
 import com.example.cricketApp.Entity.Team;
 import com.example.cricketApp.Service.TeamServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,23 +17,23 @@ public class TeamController {
     private TeamServiceImpl teamServiceImpl;
 
     @GetMapping
-    public ResponseEntity<List<Team>> getAllTeams() {
+    public ResponseEntity<List<TeamResponseDto>> getAllTeams() {
         return teamServiceImpl.getAllTeams();
     }
 
     @PostMapping
-    public ResponseEntity<String> addTeam(@RequestBody TeamDto teamDto) {
-        return teamServiceImpl.addTeam(teamDto);
+    public ResponseEntity<String> addTeam(@RequestBody TeamRequestDto teamRequestDto) {
+        return teamServiceImpl.addTeam(teamRequestDto);
     }
 
     @GetMapping("/{teamId}")
-    public ResponseEntity<Team> getTeamById(@PathVariable int teamId) {
+    public ResponseEntity<TeamResponseDto> getTeamById(@PathVariable int teamId) {
         return teamServiceImpl.getTeamById(teamId);
     }
 
     @PutMapping("/{teamId}")
-    public ResponseEntity<?> updateTeamById(@RequestBody TeamDto teamDto, @PathVariable int teamId) {
-        return teamServiceImpl.updateTeamById(teamDto, teamId);
+    public ResponseEntity<?> updateTeamById(@RequestBody TeamRequestDto teamRequestDto, @PathVariable int teamId) {
+        return teamServiceImpl.updateTeamById(teamRequestDto, teamId);
     }
 
     @DeleteMapping("/{teamId}")

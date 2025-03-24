@@ -1,5 +1,6 @@
 package com.example.cricketApp.Controller;
 
+import com.example.cricketApp.Dto.MatchResponseDto;
 import com.example.cricketApp.Entity.Match;
 import com.example.cricketApp.Service.MatchServiceImpl;
 import com.example.cricketApp.Service.ThreadPool;
@@ -17,7 +18,7 @@ public class MatchController {
     private MatchServiceImpl matchServiceImpl;
 
     @GetMapping
-    public ResponseEntity<List<Match>>getAllMatches(){
+    public ResponseEntity<List<MatchResponseDto>>getAllMatches(){
         return matchServiceImpl.getAllMatches();
     }
 

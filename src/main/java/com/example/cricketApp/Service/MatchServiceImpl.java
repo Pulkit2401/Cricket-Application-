@@ -1,7 +1,9 @@
 package com.example.cricketApp.Service;
 
+import com.example.cricketApp.Dto.MatchResponseDto;
 import com.example.cricketApp.Entity.*;
 import com.example.cricketApp.Kafka.Producer.MessageProducer;
+import com.example.cricketApp.Mapper.MatchMapper;
 import com.example.cricketApp.Repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,13 +40,14 @@ public class MatchServiceImpl implements MatchService {
 
     public static final ConcurrentHashMap<Integer, Boolean> matchFlags = new ConcurrentHashMap<>();
 
-    public ResponseEntity<List<Match>> getAllMatches() {
+    public ResponseEntity<List<MatchResponseDto>> getAllMatches() {
         try {
             List<Match> matches = matchRepository.findAll();
             if (matches.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
-            return new ResponseEntity<>(matches, HttpStatus.OK);
+            List<MatchResponseDto> matchResponseDtos = matches.stream().map(MatchMapper::toDto).toList();
+            return new ResponseEntity<>(matchResponseDtos, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
